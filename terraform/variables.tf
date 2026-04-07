@@ -1,72 +1,47 @@
 # ========================================
-# Terraform Variables
+# Core Project Configuration
 # ========================================
 
 variable "aws_region" {
-  description = "AWS region for resources"
+  description = "AWS region where resources will be created"
   type        = string
-  default     = "us-east-1"
+  default     = "ap-south-1"
 }
 
 variable "project_name" {
-  description = "Project name used for resource naming"
+  description = "Project name used for tagging resources"
   type        = string
-  default     = "aws-devops"
+  default     = "mega-devops-platform"
 }
 
-variable "environment" {
-  description = "Environment name (dev, staging, prod)"
+variable "env" {
+  description = "Deployment environment (dev, stage, prod)"
   type        = string
-  default     = "prod"
 }
 
-variable "github_repo" {
-  description = "GitHub repository in format: owner/repo"
+# ========================================
+# EC2 Configuration
+# ========================================
+
+variable "instance_type" {
+  description = "EC2 instance type based on environment"
   type        = string
-  default     = "LondheShubham153/aws-devops"
 }
 
-variable "github_branch" {
-  description = "GitHub branch to track"
+variable "key_name" {
+  description = "EC2 key pair name for SSH access"
   type        = string
-  default     = "main"
 }
 
-variable "github_token" {
-  description = "GitHub personal access token for CodePipeline"
+variable "ami_id" {
+  description = "AMI ID for EC2 instance (Amazon Linux recommended)"
   type        = string
-  sensitive   = true
+  default     = "ami-0f5ee92e2d63afc18"
 }
 
-variable "container_port" {
-  description = "Port exposed by the Docker container"
-  type        = number
-  default     = 3000
-}
-
-variable "container_cpu" {
-  description = "Fargate task CPU units"
-  type        = number
-  default     = 256
-}
-
-variable "container_memory" {
-  description = "Fargate task memory in MB"
-  type        = number
-  default     = 512
-}
-
-variable "desired_count" {
-  description = "Desired number of ECS tasks"
-  type        = number
-  default     = 2
-}
-
-variable "health_check_path" {
-  description = "Health check path for ALB"
-  type        = string
-  default     = "/health"
-}
+# ========================================
+# Networking Configuration
+# ========================================
 
 variable "vpc_cidr" {
   description = "CIDR block for VPC"
@@ -77,11 +52,14 @@ variable "vpc_cidr" {
 variable "public_subnet_cidrs" {
   description = "CIDR blocks for public subnets"
   type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
-variable "private_subnet_cidrs" {
-  description = "CIDR blocks for private subnets"
-  type        = list(string)
-  default     = ["10.0.11.0/24", "10.0.12.0/24"]
+# ========================================
+# Application Configuration (for Ansible)
+# ========================================
+
+variable "app_port" {
+  description = "Port on which application runs"
+  type        = number
+  default     = 80
 }

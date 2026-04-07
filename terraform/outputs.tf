@@ -1,5 +1,9 @@
 # ========================================
-# Terraform Outputs
+# Terraform Outputs (Clean EC2 Setup)
+# ========================================
+
+# ========================================
+# Networking Outputs
 # ========================================
 
 output "vpc_id" {
@@ -12,91 +16,85 @@ output "public_subnet_ids" {
   value       = aws_subnet.public[*].id
 }
 
-output "private_subnet_ids" {
-  description = "IDs of private subnets"
-  value       = aws_subnet.private[*].id
+# ========================================
+# Security
+# ========================================
+
+output "security_group_id" {
+  description = "Security group for EC2 instance"
+  value       = aws_security_group.app_sg.id
 }
 
-output "ecr_repository_url" {
-  description = "URL of the ECR repository"
-  value       = aws_ecr_repository.app.repository_url
+# ========================================
+# EC2 Instance Outputs (CRITICAL)
+# ========================================
+
+output "instance_id" {
+  description = "EC2 instance ID"
+  value       = aws_instance.app_server.id
 }
 
-output "ecs_cluster_name" {
-  description = "Name of the ECS cluster"
-  value       = aws_ecs_cluster.main.name
+output "instance_public_ip" {
+  description = "Public IP of EC2 instance"
+  value       = aws_instance.app_server.public_ip
 }
 
-output "ecs_service_name" {
-  description = "Name of the ECS service"
-  value       = aws_ecs_service.app.name
+output "instance_public_dns" {
+  description = "Public DNS of EC2 instance"
+  value       = aws_instance.app_server.public_dns
 }
 
-output "alb_dns_name" {
-  description = "DNS name of the Application Load Balancer"
-  value       = aws_lb.main.dns_name
+# 🔥 THIS IS USED BY ANSIBLE
+output "instance_ip" {
+  description = "Public IP used for Ansible inventory"
+  value       = aws_instance.app_server.public_ip
 }
 
-output "alb_url" {
-  description = "URL of the Application Load Balancer"
-  value       = "http://${aws_lb.main.dns_name}"
+# ========================================
+# SSH Access Helper
+# ========================================
+
+output "ssh_command" {
+  description = "SSH command to connect to EC2"
+  value       = "ssh -i <your-key.pem> ec2-user@${aws_instance.app_server.public_ip}"
 }
 
-output "codepipeline_name" {
-  description = "Name of the CodePipeline"
-  value       = aws_codepipeline.main.name
+# ========================================
+# Application Access
+# ========================================
+
+output "application_url" {
+  description = "URL to access deployed application"
+  value       = "http://${aws_instance.app_server.public_ip}:${var.app_port}"
 }
 
-output "codepipeline_url" {
-  description = "URL to view the CodePipeline in AWS Console"
-  value       = "https://${var.aws_region}.console.aws.amazon.com/codesuite/codepipeline/pipelines/${aws_codepipeline.main.name}/view"
-}
+# ========================================
+# Deployment Info
+# ========================================
 
-output "codebuild_project_name" {
-  description = "Name of the CodeBuild project"
-  value       = aws_codebuild_project.app.name
-}
-
-output "s3_artifacts_bucket" {
-  description = "Name of the S3 bucket for pipeline artifacts"
-  value       = aws_s3_bucket.artifacts.bucket
-}
-
-output "cloudwatch_log_group_ecs" {
-  description = "CloudWatch log group for ECS tasks"
-  value       = aws_cloudwatch_log_group.ecs.name
-}
-
-output "cloudwatch_log_group_codebuild" {
-  description = "CloudWatch log group for CodeBuild"
-  value       = aws_cloudwatch_log_group.codebuild.name
-}
-
-output "deployment_instructions" {
-  description = "Instructions for deploying the application"
+output "deployment_info" {
+  description = "Helpful deployment summary"
   value = <<-EOT
-    
-    ========================================
-    AWS DevOps Pipeline Deployment Complete!
-    ========================================
-    
-    Application URL: http://${aws_lb.main.dns_name}
-    
-    Pipeline Console: https://${var.aws_region}.console.aws.amazon.com/codesuite/codepipeline/pipelines/${aws_codepipeline.main.name}/view
-    
-    ECS Console: https://${var.aws_region}.console.aws.amazon.com/ecs/home?region=${var.aws_region}#/clusters/${aws_ecs_cluster.main.name}/services
-    
-    Next Steps:
-    1. Push code to GitHub to trigger the pipeline
-    2. Monitor pipeline execution in AWS Console
-    3. Access your application at the ALB URL above
-    4. View logs in CloudWatch: ${aws_cloudwatch_log_group.ecs.name}
-    
-    To trigger the pipeline manually:
-    git add .
-    git commit -m "Trigger pipeline"
-    git push origin ${var.github_branch}
-    
-    ========================================
-  EOT
+
+========================================
+🚀 DevOps Deployment Complete
+========================================
+
+Environment: ${var.env}
+
+EC2 Public IP: ${aws_instance.app_server.public_ip}
+
+Application URL:
+http://${aws_instance.app_server.public_ip}:${var.app_port}
+
+SSH Access:
+ssh -i <your-key.pem> ec2-user@${aws_instance.app_server.public_ip}
+
+Next Steps:
+1. Verify app is running in browser
+2. SSH into instance if needed
+3. Check Docker container: docker ps
+
+========================================
+EOT
 }
