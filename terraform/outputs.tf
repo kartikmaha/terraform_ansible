@@ -56,7 +56,7 @@ output "instance_ip" {
 
 output "ssh_command" {
   description = "SSH command to connect to EC2"
-  value       = "ssh -i <your-key.pem> ec2-user@${aws_instance.app_server.public_ip}"
+  value       = "ssh -i \"D:/Project/terra-key\" ec2-user@${aws_instance.app_server.public_ip}"
 }
 
 # ========================================
@@ -88,7 +88,7 @@ Application URL:
 http://${aws_instance.app_server.public_ip}:${var.app_port}
 
 SSH Access:
-ssh -i <your-key.pem> ec2-user@${aws_instance.app_server.public_ip}
+ssh -i "D:/Project/terra-key" ec2-user@${aws_instance.app_server.public_ip}
 
 Next Steps:
 1. Verify app is running in browser

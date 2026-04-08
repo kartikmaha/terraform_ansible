@@ -1,27 +1,59 @@
-# Root level .gitignore for AWS DevOps project
-# Subdirectories (app/, terraform/) have their own .gitignore files
-
-# IDE files (applies to entire project)
+# ==========================================
+# IDE & System Files
+# ==========================================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS files (applies to entire project)
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Environment variables (root level only)
+# ==========================================
+# Credentials & Secrets (CRITICAL)
+# ==========================================
+*.pem
+*.key
+*.ppk
+terra-key
+secrets/
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
-# Logs (root level)
+# ==========================================
+# Terraform Specific
+# ==========================================
+# Local config and plugins
+.terraform/
+.terraform.lock.hcl
+
+# State files (Should be in S3, never Git)
+*.tfstate
+*.tfstate.*
+
+# Variable files (Sensitive data)
+*.tfvars
+*.tfvars.json
+# Allow example files for documentation
+!*.tfvars.example
+
+# Overrides & Crashes
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+crash.log
+
+# ==========================================
+# Application & Logs
+# ==========================================
 *.log
-
-# Temporary files (root level)
+node_modules/
+dist/
+build/
 tmp/
 temp/
-deployment-outputs.txt
 outputs.txt
+deployment-outputs.txt
