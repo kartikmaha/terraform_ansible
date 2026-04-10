@@ -2,11 +2,11 @@
 - name: Bootstrap and Deploy Application
   hosts: web
   become: true
-  gather_facts: false # Prevents the initial crash
+  gather_facts: false # Absolute must
 
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    ansible_pkg_mgr: yum # Forces yum to avoid detection logic
+    ansible_pkg_mgr: yum # Hardcode this globally
     app_dir: /home/ec2-user/app
     docker_image: myapp
     container_name: myapp

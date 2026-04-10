@@ -1,22 +1,19 @@
 ---
-- name: Install required packages
-  yum:
-    name:
-      - docker
-      - git
-    state: present
-    update_cache: yes
-  vars:
-    # Double-locking the package manager to prevent background setup calls
-    ansible_pkg_mgr: yum
+# We use 'command' instead of the 'yum' module to avoid the background setup crash
+- name: Install required packages (Manual Yum)
+  command: yum install -y docker git
+  register: yum_out
+  changed_when: "'Installed' in yum_out.stdout or 'Complete!' in yum_out.stdout"
 
 - name: Start and enable Docker service
   service:
     name: docker
     state: started
     enabled: yes
+  vars:
+    # This prevents the service module from trying to gather facts
+    ansible_pkg_mgr: yum
 
-# Add your remaining deployment tasks below...
 - name: Add ec2-user to docker group
   user:
     name: ec2-user
@@ -25,23 +22,27 @@
 
 - name: Create app directory
   file:
-    path: /home/ec2-user/app
+    path: "{{ app_dir }}"
     state: directory
+    owner: ec2-user
+    group: ec2-user
 
 - name: Copy application code
   copy:
-    src: /home/ec2-user/terraform_anisble/app/
-    dest: /home/ec2-user/app/
+    src: ../app/
+    dest: "{{ app_dir }}/"
+    owner: ec2-user
+    group: ec2-user
 
 - name: Build Docker image
   shell: |
-    cd /home/ec2-user/app
-    docker build -t myapp .
+    cd {{ app_dir }}
+    docker build -t {{ docker_image }} .
 
 - name: Stop existing container (if any)
   shell: |
-    docker rm -f myapp || true
+    docker rm -f {{ container_name }} || true
 
 - name: Run Docker container
   shell: |
-    docker run -d -p 80:3000 --name myapp myapp
+    docker run -d -p {{ app_port }}:3000 --name {{ container_name }} {{ docker_image }}
