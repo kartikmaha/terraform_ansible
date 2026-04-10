@@ -1,21 +1,9 @@
 ---
-- name: Bootstrap EC2 (Install Python properly)
+- name: Bootstrap and Deploy
   hosts: web
   become: true
-  gather_facts: false # Keep this false for bootstrap
-  tasks:
-    - name: Install Python + dependencies
-      raw: |
-        sudo yum install -y python3 python3-pip python3-libselinux
+  gather_facts: false # Disable at the top level
 
-    - name: Set Python symlink
-      raw: |
-        sudo ln -sf /usr/bin/python3 /usr/bin/python
-
-- name: Deploy Application using Ansible
-  hosts: web
-  become: true
-  # ADD THIS LINE BELOW
   vars:
     ansible_python_interpreter: /usr/bin/python3
     app_dir: /home/ec2-user/app
@@ -23,5 +11,18 @@
     container_name: myapp
     app_port: 80
 
-  roles:
-    - app-role
+  tasks:
+    - name: Install Python 3
+      raw: sudo yum install -y python3 python3-pip python3-libselinux
+      changed_when: true
+
+    - name: Set Python symlink
+      raw: sudo ln -sf /usr/bin/python3 /usr/bin/python
+      changed_when: true
+
+    - name: Force Fact Gathering now that Python exists
+      setup: # This is the manual version of 'gather_facts: true'
+
+    - name: Deploy Application Role
+      include_role:
+        name: app-role
