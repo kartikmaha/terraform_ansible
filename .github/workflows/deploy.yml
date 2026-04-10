@@ -46,6 +46,21 @@ jobs:
         aws-region: ap-south-1
 
     # ----------------------------
+    # CLEANUP OLD IAM (SAFE)
+    # ----------------------------
+    - name: Cleanup Old IAM (ignore errors)
+      run: |
+        aws iam remove-role-from-instance-profile \
+          --instance-profile-name terraform-ansible-${ENV}-profile \
+          --role-name terraform-ansible-${ENV}-ec2-role || true
+
+        aws iam delete-instance-profile \
+          --instance-profile-name terraform-ansible-${ENV}-profile || true
+
+        aws iam delete-role \
+          --role-name terraform-ansible-${ENV}-ec2-role || true
+
+    # ----------------------------
     # TERRAFORM SETUP
     # ----------------------------
     - name: Setup Terraform
@@ -74,7 +89,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y jq
 
     # ----------------------------
-    # GET EC2 IP (FIXED CLEAN)
+    # GET EC2 IP
     # ----------------------------
     - name: Get EC2 IP
       run: |
@@ -100,7 +115,7 @@ jobs:
         sudo apt-get install -y ansible
 
     # ----------------------------
-    # CREATE DYNAMIC INVENTORY
+    # CREATE INVENTORY
     # ----------------------------
     - name: Create Inventory
       run: |
@@ -114,4 +129,4 @@ jobs:
     - name: Run Ansible Playbook
       run: |
         cd ansible
-        ansible-playbook -i ansible/inventories/${ENV} ansible/playbooks/site.yml
+        ansible-playbook -i inventories/${ENV} playbooks/site.yml
