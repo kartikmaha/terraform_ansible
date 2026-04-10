@@ -4,15 +4,19 @@
     name:
       - docker
       - git
-      - python3-pip
     state: present
+    update_cache: yes
+  vars:
+    # Double-locking the package manager to prevent background setup calls
+    ansible_pkg_mgr: yum
 
-- name: Start Docker
+- name: Start and enable Docker service
   service:
     name: docker
     state: started
-    enabled: true
+    enabled: yes
 
+# Add your remaining deployment tasks below...
 - name: Add ec2-user to docker group
   user:
     name: ec2-user
