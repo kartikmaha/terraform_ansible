@@ -6,7 +6,7 @@ resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr
 
   tags = {
-    Name = "${var.project_name}-${var.env}-vpc"
+    Name = "${var.project_name}-${var.environment}-vpc"
   }
 }
 
@@ -23,7 +23,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.project_name}-${var.env}-public-${count.index}"
+    Name = "${var.project_name}-${var.environment}-public-${count.index}"
   }
 }
 
@@ -35,7 +35,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${var.project_name}-${var.env}-igw"
+    Name = "${var.project_name}-${var.environment}-igw"
   }
 }
 
@@ -47,7 +47,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "${var.project_name}-${var.env}-rt"
+    Name = "${var.project_name}-${var.environment}-rt"
   }
 }
 
