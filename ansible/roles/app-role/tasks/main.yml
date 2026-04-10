@@ -7,13 +7,15 @@
   raw: mkdir -p {{ app_dir }} && sudo chown ec2-user:ec2-user {{ app_dir }}
   changed_when: true
 
-- name: Copy application code
-  copy:
-    # Use ../../ to go from playbooks -> ansible -> root
-    src: "{{ playbook_dir }}/../../app/"
-    dest: "{{ app_dir }}/"
-    owner: ec2-user
-    group: ec2-user
+- name: Pull application code via Git (Raw)
+  # This avoids the 'copy' module crash. 
+  # We clean the dir first to ensure a fresh pull.
+  raw: |
+    rm -rf {{ app_dir }}/*
+    git clone https://github.com/kartikmaha/terraform_anisble.git {{ app_dir }}/temp_repo
+    cp -r {{ app_dir }}/temp_repo/app/* {{ app_dir }}/
+    rm -rf {{ app_dir }}/temp_repo
+  changed_when: true
 
 - name: Build Docker image (Raw)
   raw: cd {{ app_dir }} && sudo docker build -t {{ docker_image }} .
