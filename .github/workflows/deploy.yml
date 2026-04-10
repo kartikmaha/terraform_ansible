@@ -1,93 +1,116 @@
-
 name: Full Deploy (Terraform + Ansible)
 
 on:
   push:
     branches:
       - main
-
-env:
-  AWS_REGION: ap-south-1
+      - dev
+      - stg
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      TF_DIR: terraform
+
     steps:
+
+    # ----------------------------
+    # CHECKOUT CODE
+    # ----------------------------
     - name: Checkout Code
       uses: actions/checkout@v3
 
     # ----------------------------
-    # SET ENV (dev/stg/prd)
+    # SET ENV BASED ON BRANCH
     # ----------------------------
     - name: Set Environment
       run: |
-        echo "ENV=dev" >> $GITHUB_ENV
+        if [[ "${GITHUB_REF##*/}" == "main" ]]; then
+          echo "ENV=prd" >> $GITHUB_ENV
+        elif [[ "${GITHUB_REF##*/}" == "stg" ]]; then
+          echo "ENV=stg" >> $GITHUB_ENV
+        else
+          echo "ENV=dev" >> $GITHUB_ENV
+        fi
 
     # ----------------------------
-    # AWS AUTH
+    # AWS LOGIN
     # ----------------------------
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: ap-south-1
 
     # ----------------------------
-    # TERRAFORM
+    # TERRAFORM SETUP
     # ----------------------------
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
+      uses: hashicorp/setup-terraform@v3
 
+    # ----------------------------
+    # TERRAFORM INIT
+    # ----------------------------
     - name: Terraform Init
       run: |
-        cd terraform
+        cd $TF_DIR
         terraform init
 
+    # ----------------------------
+    # TERRAFORM APPLY
+    # ----------------------------
     - name: Terraform Apply
       run: |
-        cd terraform
-        terraform apply -auto-approve -var-file=envs/${{ env.ENV }}.tfvars
+        cd $TF_DIR
+        terraform apply -auto-approve -var-file=envs/${ENV}.tfvars
 
     # ----------------------------
-    # GET EC2 IP
+    # INSTALL JQ
+    # ----------------------------
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    # ----------------------------
+    # GET EC2 IP (FIXED CLEAN)
     # ----------------------------
     - name: Get EC2 IP
-      id: get_ip
       run: |
-        cd terraform
-        IP=$(terraform output -raw instance_ip)
+        cd $TF_DIR
+        IP=$(terraform output -json instance_ip | jq -r '.')
         echo "EC2_IP=$IP" >> $GITHUB_ENV
 
     # ----------------------------
-    # SETUP SSH
+    # SETUP SSH KEY
     # ----------------------------
     - name: Setup SSH Key
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.EC2_KEY }}" > ~/.ssh/key.pem
-        chmod 400 ~/.ssh/key.pem
+        chmod 600 ~/.ssh/key.pem
 
     # ----------------------------
     # INSTALL ANSIBLE
     # ----------------------------
     - name: Install Ansible
       run: |
-        sudo apt update
-        sudo apt install -y ansible
+        sudo apt-get update
+        sudo apt-get install -y ansible
 
     # ----------------------------
-    # CREATE INVENTORY (DYNAMIC)
+    # CREATE DYNAMIC INVENTORY
     # ----------------------------
     - name: Create Inventory
       run: |
-        echo "[web]" > inventory
-        echo "$EC2_IP ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/key.pem" >> inventory
+        mkdir -p ansible/inventories
+        echo "[web]" > ansible/inventories/${ENV}
+        echo "$EC2_IP ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/key.pem" >> ansible/inventories/${ENV}
 
     # ----------------------------
     # RUN ANSIBLE
     # ----------------------------
-    - name: Run Ansible
+    - name: Run Ansible Playbook
       run: |
-        ansible-playbook -i inventory ansible/playbooks/site.yml
+        ansible-playbook -i ansible/inventories/${ENV} ansible/playbooks/site.yml
