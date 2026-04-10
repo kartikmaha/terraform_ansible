@@ -14,7 +14,7 @@ variable "project_name" {
   default     = "mega-devops-platform"
 }
 
-variable "env" {
+variable "environment" {
   description = "Deployment environment (dev, stage, prod)"
   type        = string
 }
