@@ -2,8 +2,7 @@
 - name: Bootstrap EC2 (Install Python properly)
   hosts: web
   become: true
-  gather_facts: false
-
+  gather_facts: false # Keep this false for bootstrap
   tasks:
     - name: Install Python + dependencies
       raw: |
@@ -16,8 +15,9 @@
 - name: Deploy Application using Ansible
   hosts: web
   become: true
-
+  # ADD THIS LINE BELOW
   vars:
+    ansible_python_interpreter: /usr/bin/python3
     app_dir: /home/ec2-user/app
     docker_image: myapp
     container_name: myapp
