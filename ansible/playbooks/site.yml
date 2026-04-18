@@ -17,11 +17,14 @@
 - name: Configure Web Server and Deploy App
   hosts: web_servers
   become: true
-  gather_facts: true
-  
+  # Explicitly tell Ansible where Python is to avoid discovery errors
   vars:
+    ansible_python_interpreter: /usr/bin/python3
     app_port: 80 
     docker_image: "kartikmaha/terraform_anisble:latest"
+
+  # We can turn fact gathering back on now that compression is disabled
+  gather_facts: true 
 
   tasks:
     - name: Install Docker
@@ -29,6 +32,8 @@
         name: docker
         state: present
         update_cache: true
+
+    # ... (rest of your tasks remain the same)
 
     - name: Start and enable Docker service
       systemd:
