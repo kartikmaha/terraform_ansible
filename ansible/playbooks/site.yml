@@ -7,35 +7,31 @@
     - name: Ensure port 22 is reachable
       ansible.builtin.wait_for:
         port: 22
-        host: "{{ ansible_host }}"
+        host: "{{ inventory_hostname }}"
         search_regex: OpenSSH
-        delay: 15        # Wait 15s before first check
-        timeout: 300     # Fail after 5 mins
+        delay: 15
+        timeout: 300
       delegate_to: localhost
 
 # PLAY 2: Infrastructure Configuration
 - name: Configure Web Server and Deploy App
   hosts: web_servers
   become: true
-  gather_facts: true     # Now safe to gather facts
+  gather_facts: true
   
   vars:
-    # Match the port in your prd.tfvars
     app_port: 80 
+    # Use your Docker Hub image here
+    docker_image: "kartikmaha/terraform_anisble:latest"
 
   tasks:
-    - name: Update all packages
-      dnf:
-        name: "*"
-        state: latest
-        update_cache: true
-
-    - name: Install Docker
+    - name: Install Docker (Amazon Linux 2023)
       dnf:
         name: docker
         state: present
+        update_cache: true
 
-    - name: Start and enable Docker service
+    - name: Start and enable Docker
       systemd:
         name: docker
         state: started
@@ -47,12 +43,15 @@
         groups: docker
         append: true
 
-    - name: Pull and run Flask App from Docker Hub
-      # Replace with your actual image name if using Docker Hub
+    - name: Reset connection to apply group changes
+      ansible.builtin.meta: reset_connection
+
+    - name: Pull and run Flask App
       community.docker.docker_container:
         name: flask_app
-        image: "{{ docker_image | default('python:3.9-slim') }}"
+        image: "{{ docker_image }}"
         state: started
         restart_policy: always
+        # Ensure your Flask app listens on 5000 inside the container
         published_ports:
-          - "{{ app_port }}:{{ app_port }}"
+          - "{{ app_port }}:5000"
