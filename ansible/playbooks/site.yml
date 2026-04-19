@@ -23,7 +23,7 @@
     ansible_python_interpreter: /usr/bin/python3
     app_port: 80 
     # This must match what was pushed in the deploy.yml
-    docker_image: "kartikmaha/terraform_anisble:latest"
+    docker_image: "kartikmaha/terraform_ansible:latest"
 
   tasks:
     - name: Install Docker
