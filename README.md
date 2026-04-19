@@ -64,46 +64,43 @@ This project focuses on:
 
 🔹 1. Code Push
 
-🚀 Developer pushes updates to GitHub.
-    
-🔄 GitHub Actions triggers the deploy.yml workflow.
+Developer pushes code to GitHub
 
-🔹 2. Build & Registry
+GitHub Actions triggers the workflow
 
-🏗️ GitHub Actions builds a Multi-stage Docker image.
+🔹 2. Build & Push
 
-📦 Image is pushed to Docker Hub with the :latest tag.
+Docker image is built using multi-stage build
+
+Image is pushed to Docker Hub
 
 🔹 3. Infrastructure Provisioning
 
-🏗️ Terraform initializes and applies the plan.
+Terraform provisions/updates AWS resources
 
-🌐 AWS resources (EC2/VPC) are verified or created.
-
-📡 Output returns the dynamic EC2 Public IP.
+EC2 public IP is generated dynamically
 
 🔹 4. Configuration & Deployment
 
-⚙️ Ansible installs Docker on the fresh instance.
+Ansible installs and configures Docker
 
-🔑 User permissions and Docker groups are configured.
+Latest container is pulled and started
 
-🚀 The Docker image is pulled and run with restart: always policy.
+🔹 5. Access
 
-🔹 5. Live Access
-
-🌐 Dashboard becomes accessible at the public IP on Port 80.
+Application is available via EC2 public IP (Port 80)
 
 ---
+
 ### 📈 Future Improvements
 
-🔄 Integrate CI/CD (GitHub Actions / Jenkins)
+🔐 Add basic security scanning (Trivy / Checkov)
 
-📦 Add Docker-based deployments
+🔄 Improve CI workflow with validations (linting, formatting)
 
-☸️ Extend to Kubernetes provisioning
+📦 Use versioned Docker image tags instead of latest
 
-🔐 Add security scanning (Trivy / Checkov)
+⚙️ Add environment-specific configs (dev/prod separation)
 
 ---
 
