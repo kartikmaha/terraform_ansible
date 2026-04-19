@@ -40,8 +40,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           # Build from the app directory where the Dockerfile is located
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/terraform_anisble:latest ./app
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/terraform_anisble:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/terraform_ansible:latest ./app
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/terraform_ansible:latest
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
