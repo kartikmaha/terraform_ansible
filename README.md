@@ -1,4 +1,4 @@
-# 🚀 Terraform + Ansible Multi-Environment Infrastructure
+# 🚀 AWS DevOps Pipeline built with Terraform, Ansible and Github Actions
 
 Production-style infrastructure provisioning and configuration management using Terraform (IaC), Ansible (Automation) and GitHub Action (CI/CD).
 This project demonstrates how to provision cloud resources and configure them automatically across multiple environments.
@@ -70,9 +70,7 @@ GitHub Actions triggers the workflow
 
 🔹 2. Build & Push
 
-Docker image is built using multi-stage build
-
-Image is pushed to Docker Hub
+Docker image is built & pushed to Docker Hub registry
 
 🔹 3. Infrastructure Provisioning
 
@@ -100,7 +98,7 @@ Application is available via EC2 public IP (Port 80)
 
 📦 Use versioned Docker image tags instead of latest
 
-⚙️ Add environment-specific configs (dev/prod separation)
+⚙️ Add environment-specific configs (dev/stg/prd separation)
 
 ---
 
