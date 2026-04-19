@@ -30,11 +30,15 @@ Demonstrates automated provisioning and configuration of cloud resources across 
 
 ### 🔄 Git Hub Actions Dashboard
 
-![Project Workflow](assets/ThreeTierChatApp.png)
+![Git Hub Actions Dashboard](assets/github_actions_workflow.png)
 
-### 🔄 AWS 
+### 🔄 AWS Console
 
-![github_actions_workflow.png](assets/ThreeTierChatApp.png)
+![AWS Console](assets/aws_ec2.png)
+
+![AWS Console](assets/aws_role.png)
+
+![AWS Console](assets/aws_vpc.png)
 
 ---
 
