@@ -218,8 +218,8 @@ function initializeMobileMenu() {
 // ========================================
 // Console Branding
 // ========================================
-console.log('%c🚀 AWS DevOps CI/CD Pipeline', 'color: #667eea; font-size: 24px; font-weight: bold; padding: 10px;');
-console.log('%cProduction-ready infrastructure built with AWS & Terraform', 'color: #a0aec0; font-size: 14px; padding: 5px;');
+console.log('%c🚀 AWS DevOps Pipeline built with Terraform, Ansible and Github Actions', 'color: #667eea; font-size: 24px; font-weight: bold; padding: 10px;');
+console.log('%cProduction-ready infrastructure built with AWS, Terraform, Ansible and Github Actions', 'color: #a0aec0; font-size: 14px; padding: 5px;');
 console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #667eea;');
-console.log('%cGitHub: https://github.com/Amitabh-DevOps/aws-devops', 'color: #667eea; font-size: 12px;');
+console.log('%cGitHub: https://github.com/kartikmaha/terraform_anisble.git', 'color: #667eea; font-size: 12px;');
 console.log('%cAuthor: Amitabh', 'color: #a0aec0; font-size: 12px;');
